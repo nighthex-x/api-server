@@ -1,10 +1,10 @@
-import os, random
+import os
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
 DATA_DIR = "data_parts"
-records = []   # প্রতিটা রেকর্ড = dict
+records = []
 
 FIELDS = ["phone","facebook_id","first_name","last_name","gender",
           "city","area","nickname","bio","signup_date","birthday"]
@@ -23,7 +23,6 @@ def load_all():
                             if not line:
                                 continue
                             parts = line.split(":")
-                            # যতগুলো ফিল্ড আছে ততটা নেবো
                             parts += [""] * (len(FIELDS) - len(parts))
                             rec = dict(zip(FIELDS, parts))
                             records.append(rec)
@@ -37,15 +36,13 @@ load_all()
 def index():
     return "API is running ✅"
 
-@app.route("/")
+@app.route("/search")
 def search():
-    num = request.args.get("number", "").strip()
+    num = request.args.get("number") or request.args.get("phone")
+    num = (num or "").strip()
     if not num:
-        return jsonify({"error": "number required"}), 400
+        return jsonify({"error": "number or phone required"}), 400
     for r in records:
         if r["phone"] == num:
-            return jsonify({
-                "data": [r],
-                "credit": "BRH-Bangladesh"
-            })
+            return jsonify({"data": [r], "credit": "BRH-Bangladesh"})
     return jsonify({"message": "not found"}), 404
