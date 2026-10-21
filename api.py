@@ -6,8 +6,8 @@ app = Flask(__name__)
 DATA_DIR = "data_parts"
 records = []
 
-FIELDS = ["phone","facebook_id","first_name","last_name","gender",
-          "city","area","nickname","bio","signup_date","birthday"]
+FIELDS = ["phone", "facebook_id", "first_name", "last_name", "gender",
+          "city", "area", "nickname", "bio", "signup_date", "birthday"]
 
 def load_all():
     global records
@@ -38,11 +38,18 @@ def index():
 
 @app.route("/search")
 def search():
+    # "phone" বা "number" — দুটাই কাজ করবে
     num = request.args.get("number") or request.args.get("phone")
     num = (num or "").strip()
+
     if not num:
         return jsonify({"error": "number or phone required"}), 400
+
     for r in records:
         if r["phone"] == num:
             return jsonify({"data": [r], "credit": "BRH-Bangladesh"})
+
     return jsonify({"message": "not found"}), 404
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
